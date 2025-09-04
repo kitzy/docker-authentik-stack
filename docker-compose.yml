@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  postgresql:
+    image: docker.io/library/postgres
+    container_name: authentik-postgresql
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: authentik
+    volumes:
+      - authentik-db:/var/lib/postgresql/data
+    networks:
+      - default
+
+  redis:
+    image: docker.io/library/redis
+    container_name: authentik-redis
+    restart: unless-stopped
+    command: ["--save", "60", "1", "--loglevel", "warning"]
+    volumes:
+      - authentik-redis:/data
+    networks:
+      - default
+
+  server:
+    image: ghcr.io/goauthentik/server
+    container_name: authentik-server
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - postgresql
+      - redis
+    # not exposing ports because we want to force through NPM
+    # ports:
+    #   - "9000:9000"
+    #   - "9443:9443"
+    volumes:
+      - authentik-media:/media
+      - authentik-custom-templates:/templates
+    networks:
+      - default
+      - proxy
+
+  worker:
+    image: ghcr.io/goauthentik/server
+    container_name: authentik-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - postgresql
+      - redis
+    command: worker
+    volumes:
+      - authentik-media:/media
+      - authentik-custom-templates:/templates
+    networks:
+      - default
+
+volumes:
+  authentik-db:
+  authentik-redis:
+  authentik-media:
+  authentik-custom-templates:
+
+networks:
+  proxy:
+    external: true
