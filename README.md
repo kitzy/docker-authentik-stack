@@ -25,13 +25,13 @@ It includes:
 
 At minimum define:
 
-POSTGRES_PASSWORD=
-AUTHENTIK_SECRET_KEY=
-AUTHENTIK_HOST=
-AUTHENTIK_URL=
-AUTHENTIK_COOKIE_DOMAIN=
+- POSTGRES_PASSWORD=
+- AUTHENTIK_SECRET_KEY=
+- AUTHENTIK_HOST=
+- AUTHENTIK_URL=
+- AUTHENTIK_COOKIE_DOMAIN=
 
 ## Notes
 
-- The ports: section is commented out; all external access should flow through NPM.
+- The ports: section is commented out; all external access should flow through NPM via the `proxy` network.
 - Back up nightly with pg_dump against the authentik Postgres database.
