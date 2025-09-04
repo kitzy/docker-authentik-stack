@@ -28,14 +28,16 @@ services:
     image: ghcr.io/goauthentik/server
     container_name: authentik-server
     restart: unless-stopped
-    env_file:
-      - .env
     environment:
-      AUTHENTIK_REDIS__HOST: redis
-      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgresql
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_PASSWORD}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_HOST: ${AUTHENTIK_HOST}
+      AUTHENTIK_URL: ${AUTHENTIK_URL}
+      AUTHENTIK_COOKIE_DOMAIN: ${AUTHENTIK_COOKIE_DOMAIN}
     depends_on:
       - postgresql
       - redis
@@ -54,14 +56,16 @@ services:
     image: ghcr.io/goauthentik/server
     container_name: authentik-worker
     restart: unless-stopped
-    env_file:
-      - .env
     environment:
-      AUTHENTIK_REDIS__HOST: redis
-      AUTHENTIK_POSTGRESQL__HOST: postgresql
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgresql
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_PASSWORD}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_HOST: ${AUTHENTIK_HOST}
+      AUTHENTIK_URL: ${AUTHENTIK_URL}
+      AUTHENTIK_COOKIE_DOMAIN: ${AUTHENTIK_COOKIE_DOMAIN}
     depends_on:
       - postgresql
       - redis
