@@ -39,8 +39,8 @@ services:
       AUTHENTIK_URL: ${AUTHENTIK_URL}
       AUTHENTIK_COOKIE_DOMAIN: ${AUTHENTIK_COOKIE_DOMAIN}
     depends_on:
-      - postgresql
-      - redis
+      - authentik-postgresql
+      - authentik-redis
     # not exposing ports because we want to force through NPM
     # ports:
     #   - "9000:9000"
@@ -67,8 +67,8 @@ services:
       AUTHENTIK_URL: ${AUTHENTIK_URL}
       AUTHENTIK_COOKIE_DOMAIN: ${AUTHENTIK_COOKIE_DOMAIN}
     depends_on:
-      - postgresql
-      - redis
+      - authentik-postgresql
+      - authentik-redis
     command: worker
     volumes:
       - authentik-media:/media
