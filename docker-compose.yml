@@ -13,6 +13,11 @@ services:
       - authentik-db:/var/lib/postgresql/data
     networks:
       - default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U authentik -d authentik"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   authentik-redis:
     image: docker.io/library/redis
@@ -23,6 +28,11 @@ services:
       - authentik-redis:/data
     networks:
       - default
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   authentik-server:
     image: ghcr.io/goauthentik/server
@@ -39,12 +49,15 @@ services:
       AUTHENTIK_URL: ${AUTHENTIK_URL}
       AUTHENTIK_COOKIE_DOMAIN: ${AUTHENTIK_COOKIE_DOMAIN}
     depends_on:
-      - authentik-postgresql
-      - authentik-redis
+      authentik-postgresql:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_healthy
     # not exposing ports because we want to force through NPM
     # ports:
     #   - "9000:9000"
     #   - "9443:9443"
+    command: server
     volumes:
       - authentik-media:/media
       - authentik-custom-templates:/templates
@@ -67,8 +80,10 @@ services:
       AUTHENTIK_URL: ${AUTHENTIK_URL}
       AUTHENTIK_COOKIE_DOMAIN: ${AUTHENTIK_COOKIE_DOMAIN}
     depends_on:
-      - authentik-postgresql
-      - authentik-redis
+      authentik-postgresql:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_healthy
     command: worker
     volumes:
       - authentik-media:/media
