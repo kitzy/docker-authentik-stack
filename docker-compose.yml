@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  postgresql:
+  authentik-postgresql:
     image: docker.io/library/postgres
     container_name: authentik-postgresql
     restart: unless-stopped
@@ -14,7 +14,7 @@ services:
     networks:
       - default
 
-  redis:
+  authentik-redis:
     image: docker.io/library/redis
     container_name: authentik-redis
     restart: unless-stopped
@@ -24,7 +24,7 @@ services:
     networks:
       - default
 
-  server:
+  authentik-server:
     image: ghcr.io/goauthentik/server
     container_name: authentik-server
     restart: unless-stopped
@@ -52,7 +52,7 @@ services:
       - default
       - proxy
 
-  worker:
+  authentik-worker:
     image: ghcr.io/goauthentik/server
     container_name: authentik-worker
     restart: unless-stopped
