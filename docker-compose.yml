@@ -87,7 +87,7 @@ services:
       - default
 
 volumes:
-  postgres:
+  postgresql:
   redis:
   media:
   custom-templates:
