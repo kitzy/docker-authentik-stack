@@ -1,16 +1,13 @@
-version: "3.8"
-
 services:
-  authentik-postgresql:
+  postgresql:
     image: docker.io/library/postgres
-    container_name: authentik-postgresql
     restart: unless-stopped
     environment:
       POSTGRES_USER: authentik
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: authentik
     volumes:
-      - authentik-db:/var/lib/postgresql/data
+      - postgresql:/var/lib/postgresql/data
     networks:
       - default
     healthcheck:
@@ -19,13 +16,12 @@ services:
       timeout: 5s
       retries: 10
 
-  authentik-redis:
+  redis:
     image: docker.io/library/redis
-    container_name: authentik-redis
     restart: unless-stopped
     command: ["--save", "60", "1", "--loglevel", "warning"]
     volumes:
-      - authentik-redis:/data
+      - redis:/data
     networks:
       - default
     healthcheck:
@@ -34,13 +30,12 @@ services:
       timeout: 5s
       retries: 10
 
-  authentik-server:
+  auth-server:
     image: ghcr.io/goauthentik/server:2025.8.1
-    container_name: authentik-server
     restart: unless-stopped
     environment:
-      AUTHENTIK_REDIS__HOST: authentik-redis
-      AUTHENTIK_POSTGRESQL__HOST: authentik-postgresql
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_PASSWORD}
@@ -49,9 +44,9 @@ services:
       AUTHENTIK_URL: ${AUTHENTIK_URL}
       AUTHENTIK_COOKIE_DOMAIN: ${AUTHENTIK_COOKIE_DOMAIN}
     depends_on:
-      authentik-postgresql:
+      postgresql:
         condition: service_healthy
-      authentik-redis:
+      redis:
         condition: service_healthy
     # not exposing ports because we want to force through NPM
     # ports:
@@ -59,19 +54,18 @@ services:
     #   - "9443:9443"
     command: server
     volumes:
-      - authentik-media:/media
-      - authentik-custom-templates:/templates
+      - media:/media
+      - custom-templates:/templates
     networks:
       - default
       - proxy
 
-  authentik-worker:
+  auth-worker:
     image: ghcr.io/goauthentik/server:2025.8.1
-    container_name: authentik-worker
     restart: unless-stopped
     environment:
-      AUTHENTIK_REDIS__HOST: authentik-redis
-      AUTHENTIK_POSTGRESQL__HOST: authentik-postgresql
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: postgresql
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_PASSWORD}
@@ -81,22 +75,22 @@ services:
       AUTHENTIK_COOKIE_DOMAIN: ${AUTHENTIK_COOKIE_DOMAIN}
       AUTHENTIK_PROXY__TRUSTED_PROXY_CIDRS: ${AUTHENTIK_PROXY__TRUSTED_PROXY_CIDRS}
     depends_on:
-      authentik-postgresql:
+      postgresql:
         condition: service_healthy
-      authentik-redis:
+      redis:
         condition: service_healthy
     command: worker
     volumes:
-      - authentik-media:/media
-      - authentik-custom-templates:/templates
+      - media:/media
+      - custom-templates:/templates
     networks:
       - default
 
 volumes:
-  authentik-db:
-  authentik-redis:
-  authentik-media:
-  authentik-custom-templates:
+  postgresql:
+  redis:
+  media:
+  custom-templates:
 
 networks:
   proxy:
