@@ -13,9 +13,9 @@ services:
       - default
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U authentik -d authentik"]
-      interval: 10s
+      interval: 180s
       timeout: 5s
-      retries: 10
+      retries: 60
 
   redis:
     image: docker.io/library/redis
