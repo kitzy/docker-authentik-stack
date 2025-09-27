@@ -90,6 +90,8 @@ services:
 
 volumes:
   postgresql:
+    external: true
+    name: authentik_postgresql
   redis:
   media:
   custom-templates:
