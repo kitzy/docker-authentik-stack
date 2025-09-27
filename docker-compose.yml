@@ -1,6 +1,6 @@
 services:
   postgresql:
-    image: docker.io/library/postgres
+    image: postgres:17
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -16,7 +16,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 30
-      start_period: 180s
+      start_period: 120s
 
   redis:
     image: docker.io/library/redis
@@ -91,8 +91,6 @@ services:
 
 volumes:
   postgresql:
-    external: true
-    name: authentik_postgresql
   redis:
   media:
   custom-templates:
