@@ -6,6 +6,7 @@ services:
       POSTGRES_USER: authentik
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: authentik
+      PGDATA: /var/lib/postgresql
     volumes:
       - postgresql:/var/lib/postgresql
     networks:
